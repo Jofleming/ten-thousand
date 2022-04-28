@@ -136,10 +136,15 @@ class NervousNellie(BaseBot):
         return "b"
 
 
-class YourBot(BaseBot):
+class This_Will_Do(BaseBot):
     def _roll_bank_or_quit(self):
-        """your logic here"""
-        return "b"
+        if self.unbanked_points >= 550:
+            return "b"
+        elif self.unbanked_points >= 300 and self.dice_remaining <= 2:
+            return "b"
+        elif self.dice_remaining == 1:
+            return "b"
+        return "r"
 
     def _enter_dice(self):
         """simulate user entering which dice to keep.
@@ -151,4 +156,4 @@ class YourBot(BaseBot):
 if __name__ == "__main__":
     num_games = 100
     NervousNellie.play(num_games)
-    YourBot.play(num_games)
+    This_Will_Do.play(num_games)
