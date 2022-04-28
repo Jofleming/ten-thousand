@@ -1,16 +1,21 @@
-from ten_thousand.game_logic import GameLogic
-from ten_thousand.banker import Banker
+try:
+    from ten_thousand.game_logic import GameLogic
+    from ten_thousand.banker import Banker
+except:
+    from game_logic import GameLogic
+    from banker import Banker
 from collections import Counter
 import sys
 
 class Game():
-    def __init__(self):
+    def __init__(self, num_rounds=20):
         self.banker = Banker()
         self.num_of_dice = 6
         self.round = 0
         self.dice_list = []
         self.dice_string = ''
         self.roller = None
+        self.num_rounds = num_rounds
 
 
     def create_dice_string(self, tuple_of_dice):
@@ -73,6 +78,9 @@ class Game():
 
     def start_new_round(self):
         self.round += 1
+        if self.round > self.num_rounds:
+            print(f'Thanks for playing. You earned {self.banker.balance} points')
+            sys.exit()
         self.num_of_dice = 6
         print(f'Starting round {self.round}')
         self.user_roll()
