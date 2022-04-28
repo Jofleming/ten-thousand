@@ -10,6 +10,7 @@ class Game():
         self.round = 0
         self.dice_list = []
         self.dice_string = ''
+        self.roller = None
 
 
     def create_dice_string(self, tuple_of_dice):
@@ -19,6 +20,7 @@ class Game():
         return return_string
 
     def play(self, roller=GameLogic.roll_dice):
+        self.roller = roller
 
         print('Welcome to Ten Thousand')
         print('(y)es to play or (n)o to decline')
@@ -27,9 +29,9 @@ class Game():
             print('OK. Maybe another time')
             sys.exit()
         elif start_response == 'y':
+            self.start_new_round()
             playing = True
             while playing == True:
-                self.start_new_round(roller)
                 print('Enter dice to keep, or (q)uit:')
                 keep_or_quit = input('> ')
                 if keep_or_quit == 'q':
@@ -54,36 +56,46 @@ class Game():
                     points = GameLogic.calculate_score(keep_list)
                     self.banker.shelf(points)
                     self.num_of_dice -= len(keep_list)
-                    print(f'You have {points} unbanked points and {self.num_of_dice} dice remaining')
+                    print(f'You have {self.banker.shelved} unbanked points and {self.num_of_dice} dice remaining')
                     print('(r)oll again, (b)ank your points or (q)uit:')
                     roll_bank_quit = input('> ')
                     if roll_bank_quit == 'b':
                         print(f'You banked {self.banker.shelved} points in round {self.round}')
                         self.banker.bank()
                         print(f'Total score is {self.banker.balance} points')
+                        self.start_new_round()
                     elif roll_bank_quit == 'q':
                         print(f'Thanks for playing. You earned {self.banker.balance} points')
                         sys.exit()
                     elif roll_bank_quit == 'r':
-                        if self.num_of_dice == 0:
-                            self.num_of_dice = 6
-                        print(f'Rolling {self.num_of_dice} dice...')
-                        self.dice_list = roller(self.num_of_dice)
-                        self.dice_string = self.create_dice_string(self.dice_list)
-                        print(f'***{self.dice_string} ***')
+                        self.user_roll()
 
 
-    def start_new_round(self, roller):
-        self.dice_string = ''
+    def start_new_round(self):
         self.round += 1
         self.num_of_dice = 6
         print(f'Starting round {self.round}')
+        self.user_roll()
+
+    def user_roll(self):
+        self.dice_string = ''
+        if self.num_of_dice == 0:
+            self.num_of_dice = 6
         print(f'Rolling {self.num_of_dice} dice...')
-        self.dice_list = roller(self.num_of_dice)
+        self.dice_list = self.roller(self.num_of_dice)
         self.dice_string = self.create_dice_string(self.dice_list)
         print(f'***{self.dice_string} ***')
+        if len(GameLogic.get_scorers(self.dice_list)) == 0:
+            self.zilch()
+    
 
-
+    def zilch(self):
+        print('****************************************')
+        print('**        Zilch!!! Round over         **')
+        print('****************************************')
+        print(f'You banked 0 points in round {self.round}')
+        print(f'Total score is {self.banker.balance} points')
+        self.start_new_round()
             
                 
 
